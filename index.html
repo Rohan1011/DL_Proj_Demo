@@ -62,26 +62,40 @@
             align-items: center;
             z-index: 100;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .controls.hidden {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+            pointer-events: none;
         }
 
         button {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
-            width: 40px;
             height: 40px;
-            border-radius: 50%;
+            padding: 0 15px;
+            border-radius: 20px;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 5px;
             transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        button.icon-only {
+            width: 40px;
+            padding: 0;
         }
 
         button:hover {
             background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
         button:active {
@@ -100,79 +114,251 @@
             width: 1px;
             height: 30px;
             background: rgba(255, 255, 255, 0.2);
+            margin: 0 5px;
         }
 
-        .upload-area {
+        .top-bar {
             position: fixed;
             top: 20px;
-            right: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
             z-index: 100;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .top-bar.hidden {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+            pointer-events: none;
         }
 
         #imageInput {
             display: none;
         }
 
-        .upload-btn {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        .upload-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .instructions {
+        .image-info {
             position: fixed;
             top: 20px;
             left: 20px;
             background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(10px);
             color: white;
-            padding: 15px 20px;
+            padding: 12px 16px;
             border-radius: 10px;
             font-size: 12px;
             z-index: 100;
-            max-width: 250px;
+            transition: opacity 0.3s;
         }
 
-        .instructions h3 {
-            margin-bottom: 8px;
-            font-size: 14px;
+        .image-info.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
 
-        .instructions ul {
-            list-style: none;
-            line-height: 1.6;
-        }
-
-        .instructions li::before {
-            content: "• ";
+        .image-info .filename {
+            font-weight: 600;
+            margin-bottom: 4px;
             color: #4CAF50;
+        }
+
+        .help-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .help-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .help-content {
+            background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            color: white;
+        }
+
+        .help-content h2 {
+            margin-bottom: 25px;
+            font-size: 28px;
+            text-align: center;
+        }
+
+        .help-section {
+            margin-bottom: 20px;
+        }
+
+        .help-section h3 {
+            color: #4CAF50;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .help-section ul {
+            list-style: none;
+            line-height: 2;
+        }
+
+        .help-section li {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .key {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 12px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 14px;
+            min-width: 60px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .image-nav {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+            transition: opacity 0.3s;
+        }
+
+        .image-nav.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .nav-btn:disabled:hover {
+            transform: none;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .minimap {
+            position: fixed;
+            bottom: 120px;
+            right: 20px;
+            width: 200px;
+            height: 150px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 100;
+            display: none;
+        }
+
+        .minimap.show {
+            display: block;
+        }
+
+        .minimap-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0.5;
+        }
+
+        .minimap-viewport {
+            position: absolute;
+            border: 2px solid #4CAF50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                padding: 10px 15px;
+                gap: 5px;
+            }
+
+            button {
+                height: 36px;
+                font-size: 12px;
+                padding: 0 12px;
+            }
+
+            button.icon-only {
+                width: 36px;
+            }
+
+            .help-content {
+                padding: 30px 20px;
+                max-width: 90vw;
+            }
+
+            .minimap {
+                width: 150px;
+                height: 112px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="instructions">
-        <h3>Controls</h3>
-        <ul>
-            <li>Mouse wheel to zoom</li>
-            <li>Click & drag to pan</li>
-            <li>+/- keys to zoom</li>
-            <li>R key to reset</li>
-        </ul>
+    <div class="image-info" id="imageInfo">
+        <div class="filename" id="filename">Sample Image</div>
+        <div id="dimensions">Loading...</div>
     </div>
 
-    <div class="upload-area">
-        <label for="imageInput" class="upload-btn">📁 Upload Image</label>
-        <input type="file" id="imageInput" accept="image/*">
+    <div class="image-nav" id="imageNav">
+        <button class="nav-btn" id="prevImage" title="Previous Image (←)">↑</button>
+        <div style="color: white; text-align: center; font-size: 12px;" id="imageCounter">1/1</div>
+        <button class="nav-btn" id="nextImage" title="Next Image (→)">↓</button>
+    </div>
+
+    <div class="top-bar" id="topBar">
+        <button id="uploadBtn">📁 Upload</button>
+        <button id="fitScreen">⛶ Fit Screen</button>
+        <button id="actualSize">1:1 Actual Size</button>
+        <button id="fullscreen">⛶ Fullscreen</button>
+        <button id="toggleUI">👁️ Toggle UI</button>
+        <button id="helpBtn">? Help</button>
     </div>
 
     <div class="viewer-container" id="viewerContainer">
@@ -181,37 +367,115 @@
         </div>
     </div>
 
-    <div class="controls">
-        <button id="zoomOut" title="Zoom Out (-)">−</button>
-        <span class="zoom-level" id="zoomLevel">100%</span>
-        <button id="zoomIn" title="Zoom In (+)">+</button>
-        <div class="separator"></div>
-        <button id="reset" title="Reset (R)">⟲</button>
+    <div class="minimap" id="minimap">
+        <img class="minimap-image" id="minimapImage" src="">
+        <div class="minimap-viewport" id="minimapViewport"></div>
     </div>
+
+    <div class="controls" id="controls">
+        <button class="icon-only" id="rotateLeft" title="Rotate Left">↺</button>
+        <button class="icon-only" id="rotateRight" title="Rotate Right">↻</button>
+        <div class="separator"></div>
+        <button class="icon-only" id="zoomOut" title="Zoom Out (-)">−</button>
+        <span class="zoom-level" id="zoomLevel">100%</span>
+        <button class="icon-only" id="zoomIn" title="Zoom In (+)">+</button>
+        <div class="separator"></div>
+        <button class="icon-only" id="reset" title="Reset (R)">⟲</button>
+    </div>
+
+    <div class="help-overlay" id="helpOverlay">
+        <div class="help-content">
+            <h2>Keyboard Shortcuts</h2>
+            
+            <div class="help-section">
+                <h3>Zoom & View</h3>
+                <ul>
+                    <li><span class="key">+/=</span> <span>Zoom In</span></li>
+                    <li><span class="key">-</span> <span>Zoom Out</span></li>
+                    <li><span class="key">R</span> <span>Reset View</span></li>
+                    <li><span class="key">0</span> <span>Actual Size (1:1)</span></li>
+                    <li><span class="key">F</span> <span>Fit to Screen</span></li>
+                    <li><span class="key">Double Click</span> <span>Quick Zoom</span></li>
+                </ul>
+            </div>
+
+            <div class="help-section">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><span class="key">↑/↓</span> <span>Previous/Next Image</span></li>
+                    <li><span class="key">←/→</span> <span>Rotate Image</span></li>
+                    <li><span class="key">U</span> <span>Toggle UI</span></li>
+                    <li><span class="key">F11</span> <span>Fullscreen</span></li>
+                </ul>
+            </div>
+
+            <div class="help-section">
+                <h3>Mouse Controls</h3>
+                <ul>
+                    <li><span class="key">Wheel</span> <span>Zoom In/Out</span></li>
+                    <li><span class="key">Drag</span> <span>Pan Image</span></li>
+                </ul>
+            </div>
+
+            <button style="margin-top: 20px; width: 100%;" id="closeHelp">Close (ESC)</button>
+        </div>
+    </div>
+
+    <input type="file" id="imageInput" accept="image/*" multiple>
 
     <script>
         let scale = 1;
         let translateX = 0;
         let translateY = 0;
+        let rotation = 0;
         let isDragging = false;
         let startX = 0;
         let startY = 0;
         let currentX = 0;
         let currentY = 0;
+        let images = [];
+        let currentImageIndex = 0;
+        let uiVisible = true;
 
         const imageWrapper = document.getElementById('imageWrapper');
         const viewerContainer = document.getElementById('viewerContainer');
         const zoomLevel = document.getElementById('zoomLevel');
         const mainImage = document.getElementById('mainImage');
         const imageInput = document.getElementById('imageInput');
+        const helpOverlay = document.getElementById('helpOverlay');
+        const minimap = document.getElementById('minimap');
+        const minimapImage = document.getElementById('minimapImage');
+        const minimapViewport = document.getElementById('minimapViewport');
 
-        const minScale = 0.5;
-        const maxScale = 10;
-        const zoomStep = 0.2;
+        const minScale = 0.1;
+        const maxScale = 20;
+        const zoomStep = 0.3;
+
+        // Initialize with default image
+        images.push({
+            src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=2000',
+            name: 'Sample Image'
+        });
+        updateImageInfo();
 
         function updateTransform() {
-            imageWrapper.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            imageWrapper.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale}) rotate(${rotation}deg)`;
             zoomLevel.textContent = `${Math.round(scale * 100)}%`;
+            
+            if (scale > 2) {
+                minimap.classList.add('show');
+                updateMinimap();
+            } else {
+                minimap.classList.remove('show');
+            }
+        }
+
+        function updateMinimap() {
+            const viewportSize = 100 / scale;
+            minimapViewport.style.width = `${viewportSize}%`;
+            minimapViewport.style.height = `${viewportSize}%`;
+            minimapViewport.style.left = `${50 - (translateX / scale / 20)}%`;
+            minimapViewport.style.top = `${50 - (translateY / scale / 20)}%`;
         }
 
         function zoomIn() {
@@ -232,13 +496,126 @@
             scale = 1;
             translateX = 0;
             translateY = 0;
+            rotation = 0;
             updateTransform();
+        }
+
+        function fitToScreen() {
+            scale = 1;
+            translateX = 0;
+            translateY = 0;
+            rotation = 0;
+            updateTransform();
+        }
+
+        function actualSize() {
+            const img = mainImage;
+            const containerWidth = viewerContainer.clientWidth;
+            const containerHeight = viewerContainer.clientHeight;
+            
+            scale = Math.min(
+                containerWidth / img.naturalWidth,
+                containerHeight / img.naturalHeight
+            ) * 0.9;
+            
+            translateX = 0;
+            translateY = 0;
+            updateTransform();
+        }
+
+        function rotateLeft() {
+            rotation -= 90;
+            updateTransform();
+        }
+
+        function rotateRight() {
+            rotation += 90;
+            updateTransform();
+        }
+
+        function toggleUI() {
+            uiVisible = !uiVisible;
+            const elements = [
+                document.getElementById('controls'),
+                document.getElementById('topBar'),
+                document.getElementById('imageInfo'),
+                document.getElementById('imageNav')
+            ];
+            elements.forEach(el => {
+                if (uiVisible) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+        }
+
+        function updateImageInfo() {
+            const img = images[currentImageIndex];
+            document.getElementById('filename').textContent = img.name;
+            document.getElementById('imageCounter').textContent = `${currentImageIndex + 1}/${images.length}`;
+            
+            const imageObj = new Image();
+            imageObj.onload = function() {
+                document.getElementById('dimensions').textContent = 
+                    `${this.naturalWidth} × ${this.naturalHeight}px`;
+            };
+            imageObj.src = img.src;
+
+            document.getElementById('prevImage').disabled = currentImageIndex === 0;
+            document.getElementById('nextImage').disabled = currentImageIndex === images.length - 1;
+        }
+
+        function loadImage(index) {
+            if (index >= 0 && index < images.length) {
+                currentImageIndex = index;
+                mainImage.src = images[index].src;
+                minimapImage.src = images[index].src;
+                reset();
+                updateImageInfo();
+            }
         }
 
         // Button controls
         document.getElementById('zoomIn').addEventListener('click', zoomIn);
         document.getElementById('zoomOut').addEventListener('click', zoomOut);
         document.getElementById('reset').addEventListener('click', reset);
+        document.getElementById('fitScreen').addEventListener('click', fitToScreen);
+        document.getElementById('actualSize').addEventListener('click', actualSize);
+        document.getElementById('rotateLeft').addEventListener('click', rotateLeft);
+        document.getElementById('rotateRight').addEventListener('click', rotateRight);
+        document.getElementById('toggleUI').addEventListener('click', toggleUI);
+        document.getElementById('prevImage').addEventListener('click', () => loadImage(currentImageIndex - 1));
+        document.getElementById('nextImage').addEventListener('click', () => loadImage(currentImageIndex + 1));
+
+        // Upload button
+        document.getElementById('uploadBtn').addEventListener('click', () => {
+            imageInput.click();
+        });
+
+        // Fullscreen
+        document.getElementById('fullscreen').addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        // Help
+        document.getElementById('helpBtn').addEventListener('click', () => {
+            helpOverlay.classList.add('show');
+        });
+
+        document.getElementById('closeHelp').addEventListener('click', () => {
+            helpOverlay.classList.remove('show');
+        });
+
+        helpOverlay.addEventListener('click', (e) => {
+            if (e.target === helpOverlay) {
+                helpOverlay.classList.remove('show');
+            }
+        });
 
         // Mouse wheel zoom
         viewerContainer.addEventListener('wheel', (e) => {
@@ -259,16 +636,30 @@
                 scale = newScale;
                 updateTransform();
             }
+        }, { passive: false });
+
+        // Double click to zoom
+        viewerContainer.addEventListener('dblclick', (e) => {
+            if (scale === 1) {
+                const rect = viewerContainer.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                scale = 3;
+                translateX = mouseX - (mouseX - translateX) * 3;
+                translateY = mouseY - (mouseY - translateY) * 3;
+            } else {
+                reset();
+            }
+            updateTransform();
         });
 
         // Click and drag to pan
         viewerContainer.addEventListener('mousedown', (e) => {
-            if (scale > 1) {
-                isDragging = true;
-                viewerContainer.classList.add('grabbing');
-                startX = e.clientX - currentX;
-                startY = e.clientY - currentY;
-            }
+            isDragging = true;
+            viewerContainer.classList.add('grabbing');
+            startX = e.clientX - currentX;
+            startY = e.clientY - currentY;
         });
 
         document.addEventListener('mousemove', (e) => {
@@ -286,8 +677,53 @@
             viewerContainer.classList.remove('grabbing');
         });
 
+        // Touch support
+        let touchStartDist = 0;
+        let touchStartScale = 1;
+
+        viewerContainer.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                touchStartDist = Math.sqrt(dx * dx + dy * dy);
+                touchStartScale = scale;
+            } else if (e.touches.length === 1) {
+                isDragging = true;
+                startX = e.touches[0].clientX - currentX;
+                startY = e.touches[0].clientY - currentY;
+            }
+        });
+
+        viewerContainer.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (e.touches.length === 2) {
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                scale = Math.max(minScale, Math.min(maxScale, touchStartScale * (dist / touchStartDist)));
+                updateTransform();
+            } else if (e.touches.length === 1 && isDragging) {
+                currentX = e.touches[0].clientX - startX;
+                currentY = e.touches[0].clientY - startY;
+                translateX = currentX;
+                translateY = currentY;
+                updateTransform();
+            }
+        }, { passive: false });
+
+        viewerContainer.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
         // Keyboard controls
         document.addEventListener('keydown', (e) => {
+            if (helpOverlay.classList.contains('show')) {
+                if (e.key === 'Escape') {
+                    helpOverlay.classList.remove('show');
+                }
+                return;
+            }
+
             switch(e.key) {
                 case '+':
                 case '=':
@@ -301,24 +737,76 @@
                 case 'R':
                     reset();
                     break;
+                case '0':
+                    actualSize();
+                    break;
+                case 'f':
+                case 'F':
+                    fitToScreen();
+                    break;
+                case 'u':
+                case 'U':
+                    toggleUI();
+                    break;
+                case 'ArrowLeft':
+                    rotateLeft();
+                    break;
+                case 'ArrowRight':
+                    rotateRight();
+                    break;
+                case 'ArrowUp':
+                    loadImage(currentImageIndex - 1);
+                    break;
+                case 'ArrowDown':
+                    loadImage(currentImageIndex + 1);
+                    break;
+                case '?':
+                    helpOverlay.classList.add('show');
+                    break;
+                case 'Escape':
+                    if (document.fullscreenElement) {
+                        document.exitFullscreen();
+                    }
+                    break;
             }
         });
 
         // Image upload
         imageInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    mainImage.src = event.target.result;
-                    reset();
-                };
-                reader.readAsDataURL(file);
+            const files = Array.from(e.target.files);
+            if (files.length > 0) {
+                images = [];
+                let loadedCount = 0;
+
+                files.forEach((file, index) => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            images.push({
+                                src: event.target.result,
+                                name: file.name
+                            });
+                            loadedCount++;
+
+                            if (loadedCount === files.length) {
+                                currentImageIndex = 0;
+                                loadImage(0);
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
             }
         });
 
         // Prevent image dragging
         mainImage.addEventListener('dragstart', (e) => e.preventDefault());
+
+        // Initialize minimap
+        mainImage.addEventListener('load', () => {
+            minimapImage.src = mainImage.src;
+            updateImageInfo();
+        });
     </script>
 </body>
 </html>
