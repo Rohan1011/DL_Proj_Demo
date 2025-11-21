@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Zoom Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .viewer-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            cursor: grab;
+        }
+
+        .viewer-container.grabbing {
+            cursor: grabbing;
+        }
+
+        .image-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease-out;
+            transform-origin: center center;
+        }
+
+        #mainImage {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px 25px;
+            border-radius: 50px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .zoom-level {
+            color: white;
+            font-size: 14px;
+            min-width: 60px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .separator {
+            width: 1px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .upload-area {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+
+        #imageInput {
+            display: none;
+        }
+
+        .upload-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .upload-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .instructions {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 12px;
+            z-index: 100;
+            max-width: 250px;
+        }
+
+        .instructions h3 {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .instructions ul {
+            list-style: none;
+            line-height: 1.6;
+        }
+
+        .instructions li::before {
+            content: "• ";
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="instructions">
+        <h3>Controls</h3>
+        <ul>
+            <li>Mouse wheel to zoom</li>
+            <li>Click & drag to pan</li>
+            <li>+/- keys to zoom</li>
+            <li>R key to reset</li>
+        </ul>
+    </div>
+
+    <div class="upload-area">
+        <label for="imageInput" class="upload-btn">📁 Upload Image</label>
+        <input type="file" id="imageInput" accept="image/*">
+    </div>
+
+    <div class="viewer-container" id="viewerContainer">
+        <div class="image-wrapper" id="imageWrapper">
+            <img id="mainImage" src="diagram.png" alt="Presentation Image">
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="zoomOut" title="Zoom Out (-)">−</button>
+        <span class="zoom-level" id="zoomLevel">100%</span>
+        <button id="zoomIn" title="Zoom In (+)">+</button>
+        <div class="separator"></div>
+        <button id="reset" title="Reset (R)">⟲</button>
+    </div>
+
+    <script>
+        let scale = 1;
+        let translateX = 0;
+        let translateY = 0;
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        let currentX = 0;
+        let currentY = 0;
+
+        const imageWrapper = document.getElementById('imageWrapper');
+        const viewerContainer = document.getElementById('viewerContainer');
+        const zoomLevel = document.getElementById('zoomLevel');
+        const mainImage = document.getElementById('mainImage');
+        const imageInput = document.getElementById('imageInput');
+
+        const minScale = 0.5;
+        const maxScale = 10;
+        const zoomStep = 0.2;
+
+        function updateTransform() {
+            imageWrapper.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            zoomLevel.textContent = `${Math.round(scale * 100)}%`;
+        }
+
+        function zoomIn() {
+            if (scale < maxScale) {
+                scale += zoomStep;
+                updateTransform();
+            }
+        }
+
+        function zoomOut() {
+            if (scale > minScale) {
+                scale -= zoomStep;
+                updateTransform();
+            }
+        }
+
+        function reset() {
+            scale = 1;
+            translateX = 0;
+            translateY = 0;
+            updateTransform();
+        }
+
+        // Button controls
+        document.getElementById('zoomIn').addEventListener('click', zoomIn);
+        document.getElementById('zoomOut').addEventListener('click', zoomOut);
+        document.getElementById('reset').addEventListener('click', reset);
+
+        // Mouse wheel zoom
+        viewerContainer.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            
+            const delta = e.deltaY > 0 ? -zoomStep : zoomStep;
+            const newScale = Math.max(minScale, Math.min(maxScale, scale + delta));
+            
+            if (newScale !== scale) {
+                const rect = viewerContainer.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                const factor = newScale / scale;
+                translateX = mouseX - (mouseX - translateX) * factor;
+                translateY = mouseY - (mouseY - translateY) * factor;
+                
+                scale = newScale;
+                updateTransform();
+            }
+        });
+
+        // Click and drag to pan
+        viewerContainer.addEventListener('mousedown', (e) => {
+            if (scale > 1) {
+                isDragging = true;
+                viewerContainer.classList.add('grabbing');
+                startX = e.clientX - currentX;
+                startY = e.clientY - currentY;
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                currentX = e.clientX - startX;
+                currentY = e.clientY - startY;
+                translateX = currentX;
+                translateY = currentY;
+                updateTransform();
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            viewerContainer.classList.remove('grabbing');
+        });
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case '+':
+                case '=':
+                    zoomIn();
+                    break;
+                case '-':
+                case '_':
+                    zoomOut();
+                    break;
+                case 'r':
+                case 'R':
+                    reset();
+                    break;
+            }
+        });
+
+        // Image upload
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    mainImage.src = event.target.result;
+                    reset();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Prevent image dragging
+        mainImage.addEventListener('dragstart', (e) => e.preventDefault());
+    </script>
+</body>
+</html>
